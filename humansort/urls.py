@@ -1,3 +1,4 @@
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls import patterns, include, url
 
 from django.contrib import admin
@@ -13,3 +14,5 @@ urlpatterns = patterns('',
     url(r'^images/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root':'images'}),
 )
+
+urlpatterns += staticfiles_urlpatterns()

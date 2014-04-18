@@ -8,8 +8,15 @@ class Command(BaseCommand):
     help = "creates objects for all the images in the image dir"
 
     def handle(self, *args, **options):
+        Object.objects.all().delete()
+
         images_path = 'images'
         onlyfiles = [f for f in listdir(images_path) if isfile(join(images_path, f))]
+        
+        
+        for f in onlyfiles:
+            o = Object(name=f, image=join(images_path, f), rank=1600)
+            o.save()
+        #self.stdout.write(str(onlyfiles))
 
-        self.stdout.write(str(onlyfiles))
 

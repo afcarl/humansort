@@ -1,3 +1,32 @@
-<a href="vote/{{ o1.id }}/{{ o2.id }}/0">Same</a>
-<a href="vote/{{ o1.id }}/{{ o2.id }}/-1"><img src="/{{ o1.image }}" width="400px" css="float: left"/></a>
-<a href="vote/{{ o1.id }}/{{ o2.id }}/1"><img src="/{{ o2.image }}" width="400px" css="float: left"/></a>
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'sort/style.css' %}" />
+
+<div id="prompt">
+    <p>
+        Which image more creatively fulfills the following prompt:
+
+        <quote>
+        "Design a smartphone application that supports college students in managing
+        their time."
+        </quote>
+    </p>
+</div>
+
+<div id="same">
+    <a href="vote/{{ o1.id }}/{{ o2.id }}/0"><h1>They are the same</h2></a>
+</div>
+
+<div class="left">
+    <div id="image1">
+        <a href="vote/{{ o1.id }}/{{ o2.id }}/-1">
+            <img src="/{{ o1.image }}" width="400px"/>
+        </a>
+    </div>
+</div>
+
+<div class="right">
+    <div id="image2">
+        <a href="vote/{{ o1.id }}/{{ o2.id }}/1"><img src="/{{ o2.image }}" width="400px"/></a>
+    </div>
+</div>
+
