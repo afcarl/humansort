@@ -2,5 +2,5 @@
 <link rel="stylesheet" type="text/css" href="{% static 'sort/style.css' %}" />
 
 {% for o in objects %}
-    <li>{{ o.name }}: {{ o.rank }}</li>
+    <li><img src="/images/{{ o.name }}"/>: {{ o.rank }}</li>
 {% endfor %}

@@ -1,0 +1,9 @@
+To get this to sort some images use the following procedure.
+
+0. Delete the images currently in the images folder and put the images you want
+to rank by creativity. (if you have your own images to rank)
+1. run "python3 manage.py syncdb"
+2. run "python3 manage.py import"
+3. run "python3 manage.py runserver 0.0.0.0:8000"
+4. Have people go to the URL of the devleopment server at: "<host>:8000/sort/"
+5. View the active rankings at the following URL: "<host>:8000/sort/rank" 

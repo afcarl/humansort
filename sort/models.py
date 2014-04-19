@@ -4,7 +4,7 @@ from django.db import models
 class Object(models.Model):
     name = models.CharField(max_length=200)
     image = models.ImageField(upload_to='images')
-    rank = models.IntegerField(default=1600)
+    rank = models.FloatField(default=0.0)
 
     def __str__(self):
         return str((self.name, self.rank))
