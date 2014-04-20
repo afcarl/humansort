@@ -26,11 +26,11 @@ def rank(request):
     print("# rankings: %i" % len(Ranking.objects.all()))
     
     for o in Object.objects.all():
-        o.rank = random.random()
+        o.rank = random.random() / 10000.0
         o.save()
 
     last_error = float('inf') 
-    diff = 100
+    diff = float('inf')
 
     #for i in range(0,5):
     while diff > 0.5:
@@ -64,10 +64,10 @@ def rank(request):
                 accuracy = wins / opponent_count
 
                 #handle extremes
-                if accuracy == 0 or not accuracy:
-                    accuracy = 0.1
+                if accuracy == 0:
+                    accuracy = 0.0001/1.0001
                 elif accuracy == 1:
-                    accuracy = 0.9
+                    accuracy = 10000.0/10001.0
 
                 #print("prob: %0.4f" % accuracy)
 
@@ -77,7 +77,6 @@ def rank(request):
                 error += abs(o.rank - new_rank)
                 ranks[o.id] = new_rank
             else:
-                error += abs(o.rank - 0.0)
                 ranks[o.id] = 0.0
 
         for o in Object.objects.all():
@@ -87,7 +86,7 @@ def rank(request):
         diff = abs(last_error - error)
         last_error = error
 
-    obs = Object.objects.order_by('rank')
+    obs = Object.objects.order_by('-rank')
 
     template = loader.get_template('sort/rank.html')
     context = RequestContext(request, {
