@@ -5,6 +5,7 @@ class Object(models.Model):
     name = models.CharField(max_length=200)
     image = models.ImageField(upload_to='images')
     rank = models.FloatField(default=0.0)
+    confidence = models.FloatField(default=0.0)
 
     def __str__(self):
         return str((self.name, self.rank))

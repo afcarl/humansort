@@ -1,6 +1,8 @@
 {% load staticfiles %}
 <link rel="stylesheet" type="text/css" href="{% static 'sort/style.css' %}" />
 
+<h2>Number of rankings: {{ num_rankings }}</h2>
+
 {% for o in objects %}
-    <li><img src="/images/{{ o.name }}"/>: {{ o.rank }}</li>
+    <li><img src="/images/{{ o.name }}"/>: {{ o.rank }} +/- {{ o.confidence }}</li>
 {% endfor %}

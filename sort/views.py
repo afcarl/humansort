@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from django.core.urlresolvers import reverse
-from math import pow, log
+from math import pow, log, sqrt
 import random
 
 from sort.models import Ranking, Object
@@ -23,10 +23,10 @@ def index(request):
     return HttpResponse(template.render(context))
 
 def rank(request):
-    print("# rankings: %i" % len(Ranking.objects.all()))
     
     for o in Object.objects.all():
         o.rank = random.random() / 10000.0
+        o.confidence = 100.0
         o.save()
 
     last_error = float('inf') 
@@ -38,6 +38,7 @@ def rank(request):
 
         error = 0
         ranks = {}
+        confidence = {}
 
         for o in Object.objects.all():
             opponent_sum = 0.0
@@ -74,13 +75,38 @@ def rank(request):
                 new_rank = opponent_average + log(accuracy/(1-accuracy))
                 #print("rank: %0.4f" % new_rank)
 
+                A = 100.0
+                if opponent_count > 1:
+                    sum_error = 0.0
+                    for oa in Object.objects.all():
+                        for r in Ranking.objects.filter(first=oa):
+                            if r.value == 0:
+                                sum_error += (0.5 - accuracy) * (0.5 - accuracy)
+                            elif r.value == 1:
+                                sum_error += (1 - accuracy) * (1 - accuracy)
+                            else:
+                                sum_error += (0 - accuracy) * (0 - accuracy)
+                        for r in Ranking.objects.filter(second=oa):
+                            if r.value == 0:
+                                sum_error += (0.5 - accuracy) * (0.5 - accuracy)
+                            elif r.value == -1:
+                                wins += 1
+                                sum_error += (1 - accuracy) * (1 - accuracy)
+                            else:
+                                sum_error += (0 - accuracy) * (0 - accuracy)
+                    s = sqrt((1 / (opponent_count - 1)) * sum_error)
+                    A = 1.96 * (s / sqrt(opponent_count))
+
                 error += abs(o.rank - new_rank)
                 ranks[o.id] = new_rank
+                confidence[o.id] = A
             else:
                 ranks[o.id] = 0.0
+                confidence[o.id] = 100.0
 
         for o in Object.objects.all():
             o.rank = ranks[o.id]
+            o.confidence = confidence[o.id]
             o.save()
 
         diff = abs(last_error - error)
@@ -90,6 +116,7 @@ def rank(request):
 
     template = loader.get_template('sort/rank.html')
     context = RequestContext(request, {
+        'num_rankings': len(Ranking.objects.all()),
         'objects': obs,
     })
     return HttpResponse(template.render(context))
