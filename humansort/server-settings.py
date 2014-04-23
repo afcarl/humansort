@@ -17,18 +17,19 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'pzs2s*b(7#vr5$%twdy=(peyacir6^halqp-txy&twoeva4+bb'
+SECRET_KEY = 'p3202slj%^&(7#vr5$%twdy=(peyacir6^halqp-txy&twoeva4+bb'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-TEMPLATE_DEBUG = True
+DEBUG = False
+TEMPLATE_DEBUG = False
 
 
 TEMPLATE_DIRS = (
-    '/Users/cmaclell/Dropbox/projects/humansort/template',
+    '/home/cmaclell/humansort/template',
+    #'/Users/cmaclell/Dropbox/projects/humansort/template',
 )
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -83,7 +84,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 STATICFILES_DIRS = ( 
-    '/Users/cmaclell/Dropbox/projects/humansort/static',
+    '/home/cmaclell/humansort/static',
+    #'/Users/cmaclell/Dropbox/projects/humansort/static',
 )
 
-STATIC_URL = '/static/'
+STATIC_URL = '/humansort/static/'
