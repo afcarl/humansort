@@ -10,7 +10,7 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^sort/', include('sort.urls')),
+    url(r'^', include('sort.urls')),
     url(r'^images/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root':'images'}),
 )
