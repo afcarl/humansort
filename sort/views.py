@@ -4,6 +4,7 @@ from django.template import RequestContext, loader
 from django.core.urlresolvers import reverse
 from math import pow, log, sqrt
 import random
+import csv
 
 from sort.models import Ranking, Object
 
@@ -22,8 +23,22 @@ def index(request):
     })
     return HttpResponse(template.render(context))
 
-def rank(request):
+def export(request):
+    compute_ranking()
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="ranking.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['name', 'image', 'rank', 'confidence'])
+
+    obs = Object.objects.order_by('-rank')
+    for o in obs:
+        writer.writerow([o.name, o.image, o.rank, o.confidence])
     
+    return response
+
+def compute_ranking():
     for o in Object.objects.all():
         o.rank = random.random() / 10000.0
         o.confidence = 100.0
@@ -111,6 +126,11 @@ def rank(request):
 
         diff = abs(last_error - error)
         last_error = error
+
+
+def rank(request):
+    
+    compute_ranking()
 
     obs = Object.objects.order_by('-rank')
 
