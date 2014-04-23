@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from os.path import isfile, join
 from sort.models import Object
 from os import listdir
@@ -15,7 +15,7 @@ class Command(BaseCommand):
         
         
         for f in onlyfiles:
-            o = Object(name=f, image=join(images_path, f), rank=1600)
+            o = Object(name=f, image=join(images_path, f), rank=0.0)
             o.save()
         #self.stdout.write(str(onlyfiles))
 

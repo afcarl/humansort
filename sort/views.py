@@ -1,8 +1,7 @@
-from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from django.core.urlresolvers import reverse
-from math import pow, log, sqrt
+from math import log, sqrt
 import random
 import csv
 
