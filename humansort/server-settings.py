@@ -29,7 +29,7 @@ TEMPLATE_DIRS = (
     #'/Users/cmaclell/Dropbox/projects/humansort/template',
 )
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['protolab.cs.cmu.edu']
 
 # Application definition
 

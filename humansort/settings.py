@@ -28,7 +28,7 @@ TEMPLATE_DIRS = (
     '/Users/cmaclell/Dropbox/projects/humansort/template',
 )
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
