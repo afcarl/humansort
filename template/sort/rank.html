@@ -4,5 +4,5 @@
 <h2>Number of rankings: {{ num_rankings }}</h2>
 
 {% for o in objects %}
-    <li><img src="../{{ o.image }}"/>: {{ o.rank }} +/- {{ o.confidence }}</li>
+    <li><img src="{{ o.image }}"/>: {{ o.rank }} +/- {{ o.confidence }}</li>
 {% endfor %}
