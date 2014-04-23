@@ -20,15 +20,15 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = 'pzs2s*b(7#vr5$%twdy=(peyacir6^halqp-txy&twoeva4+bb'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+TEMPLATE_DEBUG = False
 
-TEMPLATE_DEBUG = True
 
 TEMPLATE_DIRS = (
     '/Users/cmaclell/Dropbox/projects/humansort/template',
 )
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost']
 
 # Application definition
 
