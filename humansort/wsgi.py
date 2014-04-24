@@ -26,7 +26,9 @@ for path in paths:
 
 #print(sys.path)
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "humansort.server-settings")
+# To fix multiple django instances on same domain.
+#os.environ.setdefault("DJANGO_SETTINGS_MODULE", "humansort.server-settings")
+os.environ["DJANGO_SETTINGS_MODULE"] = "humansort.server-settings"
 
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
