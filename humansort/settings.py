@@ -25,7 +25,7 @@ TEMPLATE_DEBUG = True
 
 
 TEMPLATE_DIRS = (
-    '/Users/cmaclell/Dropbox/projects/humansort/template',
+    '/Users/Aditya/Desktop/humansort/template',
 )
 
 ALLOWED_HOSTS = ['*']
@@ -83,7 +83,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 STATICFILES_DIRS = ( 
-    '/Users/cmaclell/Dropbox/projects/humansort/static',
+    '/Users/Aditya/Desktop/humansort/static',
 )
 
 STATIC_URL = '/static/'

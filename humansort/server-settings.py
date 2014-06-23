@@ -25,7 +25,7 @@ TEMPLATE_DEBUG = False
 
 
 TEMPLATE_DIRS = (
-    '/home/cmaclell/humansort/template',
+    '/Users/Aditya/Desktop/humansort/template',
     #'/Users/cmaclell/Dropbox/projects/humansort/template',
 )
 
@@ -84,7 +84,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 STATICFILES_DIRS = ( 
-    '/home/cmaclell/humansort/static',
+    '/Users/Aditya/Desktop/humansort/static',
     #'/Users/cmaclell/Dropbox/projects/humansort/static',
 )
 
