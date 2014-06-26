@@ -27,7 +27,7 @@ def compute_ranking(items, ratings):
     diff = float('inf')
 
     iteration = 1
-    while diff > 0.5:
+    while diff > 0.005:
         print("Iteration: %i (diff = %0.2f)" % (iteration, diff))
 
         error = 0
@@ -110,12 +110,20 @@ def compute_ranking(items, ratings):
         iteration += 1
 
 def rank_probabilistic(i1, i2):
+    noise = 0.0
+
     #print(1.0 / (1.0 + exp(-1.0 * (i1.value - i2.value))))
     if (abs(i1.value - i2.value) <= 0.05):
+        if random.random() <= noise:
+            return random.choice([0,1])
         return 0.5
     elif random.random() <= 1.0 / (1.0 + exp(-1.0 * (i1.value - i2.value))):
+        if random.random() <= noise:
+            return random.choice([0.5,0])
         return 1
     else:
+        if random.random() <= noise:
+            random.choice([0.5,1])
         return 0
 
 def rank_deterministic(i1, i2):
@@ -139,15 +147,52 @@ def std(values):
 
     return sqrt(variance)
 
-if __name__ == "__main__":
-    items = [Item(random.normalvariate(0,1)) for i in range(10)]
-    #all ratings
-    #ratings = [Rating(i1, i2, rank_probabilistic(i1,i2)) for i1 in items for i2 in items if i1 != i2]
+def randomly_sample(items, n):
     ratings = []
-    for i in range(40):
+    for i in range(n):
         i1 = random.choice(items)
         i2 = random.choice(items)
         ratings.append(Rating(i1, i2, rank_probabilistic(i1,i2)))
+    return ratings
+
+def connected_sample(items, n):
+    ratings = []
+    counts = {e:0 for e in items}
+    pairs = []
+    links = {e:[] for e in items}
+
+    for i in range(n):
+        sample = [img[2] for img in sorted([(counts[e], random.random(), e) for e
+                                            in counts])][0:2]
+#        count = 0
+#        offset = 0
+#        while (sample[0], sample[1]) in pairs:
+#            sample = [img[2] for img in sorted([(counts[e], random.random(), e) for e
+#                                                in counts])][0:offset+2]
+#            count += 1
+#
+#            if count > 100:
+#                offset += 1
+#                count = 0
+
+
+        counts[sample[0]] += 1
+        counts[sample[1]] += 1
+        pairs.append((sample[0], sample[1]))
+        pairs.append((sample[1], sample[0]))
+        links[sample[0]].append(sample[1])
+        links[sample[1]].append(sample[0])
+
+        ratings.append(Rating(sample[0], sample[1],
+                              rank_probabilistic(sample[0], sample[1])))
+    return ratings
+
+if __name__ == "__main__":
+    items = [Item(random.normalvariate(0,1)) for i in range(48)]
+    #all ratings
+    #ratings = [Rating(i1, i2, rank_probabilistic(i1,i2)) for i1 in items for i2 in items if i1 != i2]
+    ratings = randomly_sample(items, 750)
+    #ratings = connected_sample(items, 750)
 
     #print("RATINGS")
     #for r in ratings:
