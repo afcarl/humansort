@@ -1,6 +1,8 @@
 import random
 from math import sqrt, log, exp
 import matplotlib.pyplot as plt
+import numpy as np
+from scipy.stats import pearsonr
 
 class Item:
 
@@ -28,7 +30,7 @@ def compute_ranking(items, ratings):
 
     iteration = 1
     while diff > 0.005:
-        print("Iteration: %i (diff = %0.2f)" % (iteration, diff))
+        #print("Iteration: %i (diff = %0.2f)" % (iteration, diff))
 
         error = 0
         ranks = {}
@@ -150,9 +152,12 @@ def std(values):
 def randomly_sample(items, n):
     ratings = []
     for i in range(n):
-        i1 = random.choice(items)
-        i2 = random.choice(items)
-        ratings.append(Rating(i1, i2, rank_probabilistic(i1,i2)))
+        sample = [i for i in items]
+        random.shuffle(sample)
+        i1 = sample[0]
+        i2 = sample[1]
+        for i in range(3):
+            ratings.append(Rating(i1, i2, rank_probabilistic(i1,i2)))
     return ratings
 
 def connected_sample(items, n):
@@ -176,56 +181,116 @@ def connected_sample(items, n):
 #                count = 0
 
 
-        counts[sample[0]] += 1
-        counts[sample[1]] += 1
-        pairs.append((sample[0], sample[1]))
-        pairs.append((sample[1], sample[0]))
-        links[sample[0]].append(sample[1])
-        links[sample[1]].append(sample[0])
+        for i in range(1):
+            counts[sample[0]] += 1
+            counts[sample[1]] += 1
+            pairs.append((sample[0], sample[1]))
+            pairs.append((sample[1], sample[0]))
+            links[sample[0]].append(sample[1])
+            links[sample[1]].append(sample[0])
 
-        ratings.append(Rating(sample[0], sample[1],
-                              rank_probabilistic(sample[0], sample[1])))
+            ratings.append(Rating(sample[0], sample[1],
+                                  rank_probabilistic(sample[0], sample[1])))
+        #ratings.append(Rating(sample[0], sample[1],
+        #                      rank_deterministic(sample[0], sample[1])))
+    return ratings
+
+def online_sample(items, n):
+    ratings = []
+    counts = {e:0 for e in items}
+    pairs = []
+    links = {e:[] for e in items}
+
+    for i in range(n):
+        compute_ranking(items, ratings)
+
+        sample = [img[2] for img in sorted([(-1 * e.confidence, random.random(), e) for e
+                                            in counts])][0:2]
+#        count = 0
+#        offset = 0
+#        while (sample[0], sample[1]) in pairs:
+#            sample = [img[2] for img in sorted([(counts[e], random.random(), e) for e
+#                                                in counts])][0:offset+2]
+#            count += 1
+#
+#            if count > 100:
+#                offset += 1
+#                count = 0
+
+
+        for i in range(3):
+            counts[sample[0]] += 1
+            counts[sample[1]] += 1
+            pairs.append((sample[0], sample[1]))
+            pairs.append((sample[1], sample[0]))
+            links[sample[0]].append(sample[1])
+            links[sample[1]].append(sample[0])
+
+            ratings.append(Rating(sample[0], sample[1],
+                                  rank_probabilistic(sample[0], sample[1])))
+        #ratings.append(Rating(sample[0], sample[1],
+        #                      rank_deterministic(sample[0], sample[1])))
     return ratings
 
 if __name__ == "__main__":
-    items = [Item(random.normalvariate(0,1)) for i in range(48)]
-    #all ratings
-    #ratings = [Rating(i1, i2, rank_probabilistic(i1,i2)) for i1 in items for i2 in items if i1 != i2]
-    ratings = randomly_sample(items, 750)
-    #ratings = connected_sample(items, 750)
+    
+    for outer in range(77):
+        correlations = []
+        for inner in range(30):
+            items = [Item(random.normalvariate(0,1)) for i in range(100)]
+            #all ratings
+            #ratings = [Rating(i1, i2, rank_probabilistic(i1,i2)) for i1 in items for i2 in items if i1 != i2]
+            ratings = randomly_sample(items, 10*outer + 1)
+            #ratings = connected_sample(items, 10*outer+1 )
+            #ratings = online_sample(items, 250)
 
-    #print("RATINGS")
-    #for r in ratings:
-    #    print("%s vs. %s => %i" %(r.first.value, r.second.value, r.value))
+            #print("RATINGS")
+            #for r in ratings:
+            #    print("%s vs. %s => %i" %(r.first.value, r.second.value, r.value))
 
-    print("ITEMS")
-    #items.sort(key=lambda x: x.value)
-    for i in items:
-        print("%s: %0.2f (%0.2f)" % (i.value, i.rank, i.confidence))
+            #print("ITEMS")
+            ##items.sort(key=lambda x: x.value)
+            #for i in items:
+            #    print("%s: %0.2f (%0.2f)" % (i.value, i.rank, i.confidence))
 
-    print()
-    print("Estimating rank...")
-    compute_ranking(items, ratings)
+            #print()
+            #print("Estimating rank...")
+            compute_ranking(items, ratings)
 
-    print()
-    print("ITEMS")
-    #items.sort(key=lambda x: x.value)
-    for i in items:
-        print("%s: %0.2f (%0.2f)" % (i.value, i.rank, i.confidence))
+            #print()
+            #print("ITEMS")
+            ##items.sort(key=lambda x: x.value)
+            #for i in items:
+            #    print("%s: %0.2f (%0.2f)" % (i.value, i.rank, i.confidence))
 
-    x = [i.value for i in items]    
-    xmean = mean(x)
-    xstd = std(x)
-    x = [(v - xmean)/xstd for v in x]
-    y = [i.rank for i in items]
-    ymean = mean(y)
-    ystd = std(y)
-    y = [(v - ymean)/ystd for v in y]
+            x = [i.value for i in items]    
+            xmean = mean(x)
+            xstd = std(x)
+            #x = [(v - xmean)/xstd for v in x]
+            y = [i.rank for i in items]
+            ymean = mean(y)
+            ystd = std(y)
+            #y = [(v - ymean)/ystd for v in y]
 
-    for i in range(len(x)):
-        print("%0.3f\t%0.3f" % (x[i], y[i]))
+            #for i in range(len(x)):
+            #    print("%0.3f\t%0.3f" % (x[i], y[i]))
 
-    plt.scatter(x,y)
 
-    plt.show()
+            #plt.scatter(x,y)
+
+            m,b = np.polyfit(x, y, 1)
+            #print(x)
+            #print(m*np.array(x) + b)
+            plt.clf()
+            plt.plot(x, y, '.')
+            plt.plot(x, m * np.array(x) + b, '-')
+
+            corr, p = pearsonr(x,y)
+            correlations.append(corr)
+            #print(corr)
+            #print('Correlation Coefficient: %0.3f (p < %0.3f)' %
+            #      (corr, p))
+
+        #plt.show()
+        print(sum(correlations)/(1.0 * len(correlations)))
 

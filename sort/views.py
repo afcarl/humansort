@@ -13,22 +13,23 @@ def index(request):
     #r = random.randint(0,len(obs)-2)
     #obs = obs[r:r+2]
 
-    #obs = list(Object.objects.order_by('?')[0:2])
+    obs = list(Object.objects.order_by('?')[0:2])
+    total = len(Ranking.objects.all())
 
-
-    objects = list(Object.objects.all())
-    counts = {o:0 for o in objects}
-    for o in objects:
-        counts[o] += len(Ranking.objects.filter(first=o))
-        counts[o] += len(Ranking.objects.filter(second=o))
-    
-    obs = [img[2] for img in sorted([(counts[e], random.random(), e) for e
-                                        in counts])][0:2]
+    #objects = list(Object.objects.all())
+    #counts = {o:0 for o in objects}
+    #for o in objects:
+    #    counts[o] += len(Ranking.objects.filter(first=o))
+    #    counts[o] += len(Ranking.objects.filter(second=o))
+    #
+    #obs = [img[2] for img in sorted([(counts[e], random.random(), e) for e
+    #                                    in counts])][0:2]
 
     template = loader.get_template('sort/index.html')
     context = RequestContext(request, {
         'o1': obs[0],
         'o2': obs[1],
+        'total' : total,
     })
     return HttpResponse(template.render(context))
 
