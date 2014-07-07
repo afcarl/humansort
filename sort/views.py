@@ -33,6 +33,11 @@ def index(request):
     })
     return HttpResponse(template.render(context))
 
+def graph(request):
+    template = loader.get_template('sort/graph.html')
+    context = RequestContext(request, {})
+    return HttpResponse(template.render(context))
+
 def export(request):
     compute_ranking()
 
