@@ -43,11 +43,11 @@ def pairwise_raw(request):
     response['Content-Disposition'] = 'attachment; filename="pairwise_raw.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(['user', 'first', 'second', 'value'])
+    writer.writerow(['id', 'user', 'first', 'second', 'value'])
 
     obs = Ranking.objects.all()
     for o in obs:
-        writer.writerow([o.user, o.first.name, o.second.name, o.value])
+        writer.writerow([o.id, o.user, o.first.name, o.second.name, o.value])
     
     return response
 
