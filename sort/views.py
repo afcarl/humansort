@@ -202,7 +202,8 @@ def vote(request, first, second, value):
     #o2.save()
 
     # use this to save the ranking for possible later analysis
-    user = request.session.session_key
+    user = request.META['REMOTE_ADDR']
+    #user = request.session.session_key
     if not user:
         user = "Unknown"
     r = Ranking(user=user, first=o1, second=o2, value=value)
