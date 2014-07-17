@@ -41,22 +41,32 @@ def compute_ranking(items, ratings):
             opponent_count = 0.0
             wins = 0.0
 
+            test_rank = 0
+
             for r in ratings:
                 if r.first == o:
                     opponent_sum = r.second.rank
                     opponent_count += 1
                     if r.value == 0.5:
+                        test_rank += r.second.rank + log(r.value / (1-r.value))
                         wins += 0.5
                     elif r.value == 1:
                         wins += 1.0
+                        test_rank += r.second.rank + log(0.95 / (1-0.95))
+                    else:
+                        test_rank += r.second.rank + log(0.05 / (1-0.05))
 
                 elif r.second == o:
                     opponent_sum = r.first.rank
                     opponent_count += 1
                     if r.value == 0.5:
+                        test_rank += r.first.rank + log(r.value / (1-r.value))
                         wins += 0.5
                     elif r.value == 0:
+                        test_rank += r.first.rank + log(0.95 / (1-0.95))
                         wins += 1
+                    else:
+                        test_rank += r.first.rank + log(0.05 / (1-0.05))
 
             if opponent_count > 0:
                 opponent_average = opponent_sum / opponent_count
@@ -64,14 +74,22 @@ def compute_ranking(items, ratings):
 
                 #handle extremes
                 if accuracy == 0:
-                    accuracy = 0.01/1.01
+                    accuracy = 0.05
+                    #accuracy = 0.01/1.01
                 elif accuracy == 1:
-                    accuracy = 100.0/101.0
+                    #accuracy = 100.0/101.0
+                    accuracy = 0.95
 
                 #print("prob: %0.4f" % accuracy)
 
-                new_rank = opponent_average + log(accuracy/(1-accuracy))
+                # Compute the estimate of the average
+                #new_rank = opponent_average + log(accuracy/(1-accuracy))
+                #print("new rank:", new_rank)
+                #print("test rank:", test_rank/opponent_count)
                 #print("rank: %0.4f" % new_rank)
+
+                # compute computer the average over the estimates
+                new_rank = test_rank / opponent_count
 
                 A = 100.0
                 if opponent_count > 1:
@@ -234,13 +252,14 @@ def online_sample(items, n):
 
 if __name__ == "__main__":
     
-    for outer in range(77):
+    for outer in range(70):
         correlations = []
         for inner in range(30):
-            items = [Item(random.normalvariate(0,1)) for i in range(100)]
+            items = [Item(random.normalvariate(0,1)) for i in range(48)]
             #all ratings
             #ratings = [Rating(i1, i2, rank_probabilistic(i1,i2)) for i1 in items for i2 in items if i1 != i2]
             ratings = randomly_sample(items, 10*outer + 1)
+            #ratings = randomly_sample(items, 200)
             #ratings = connected_sample(items, 10*outer+1 )
             #ratings = online_sample(items, 250)
 

@@ -38,6 +38,21 @@ def graph(request):
     context = RequestContext(request, {})
     return HttpResponse(template.render(context))
 
+def pairwise_raw(request):
+    compute_ranking()
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="pairwise_raw.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['user', 'first', 'second', 'value'])
+
+    obs = Object.objects.all()
+    for o in obs:
+        writer.writerow([o.user, o.first, o.second, o.value])
+    
+    return response
+
 def export(request):
     compute_ranking()
 
