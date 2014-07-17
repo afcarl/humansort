@@ -13,7 +13,7 @@ def index(request):
     #r = random.randint(0,len(obs)-2)
     #obs = obs[r:r+2]
 
-    user = request.META['REMOTE_ADDR']
+    user = request.META.get('REMOTE_ADDR')
     if not user:
         user = "Unknown"
 
@@ -206,7 +206,7 @@ def vote(request, first, second, value):
     #o2.save()
 
     # use this to save the ranking for possible later analysis
-    user = request.META['REMOTE_ADDR']
+    user = request.META.get('REMOTE_ADDR')
     #user = request.session.session_key
     if not user:
         user = "Unknown"
