@@ -8,7 +8,7 @@ class Object(models.Model):
     confidence = models.FloatField(default=0.0)
 
     def __str__(self):
-        return str((self.name, self.rank))
+        return str((self.id, self.name, self.rank))
 
 class Ranking(models.Model):
     user = models.CharField(max_length=200)
@@ -18,6 +18,11 @@ class Ranking(models.Model):
 
     def __str__(self):
         return str((self.user, self.first, self.second, self.value))
+
+class IndividualRanking(models.Model):
+    user = models.CharField(max_length=200)
+    obj = models.ForeignKey(Object, related_name="object")
+    value = models.IntegerField()
 
 #class Queue(models.Model):
 #    first = models.ForeignKey(Object, related_name='queue_first')

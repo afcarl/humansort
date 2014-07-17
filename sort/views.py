@@ -5,7 +5,43 @@ from math import log, sqrt
 import random
 import csv
 
-from sort.models import Ranking, Object
+from sort.models import IndividualRanking, Ranking, Object
+
+def individual(request):
+    user = request.META.get('REMOTE_ADDR') 
+    if not user:
+        user = "Unknown"
+
+    rated_ids = [o.obj.id for o in IndividualRanking.objects.filter(user=user)]
+    ranking_count = IndividualRanking.objects.filter(user=user).count()
+    object_count = Object.objects.all().count()
+
+    if object_count - ranking_count <= 0:
+        template = loader.get_template('sort/done.html')
+        context = RequestContext(request, {})
+        return HttpResponse(template.render(context))
+
+    obj = Object.objects.exclude(id__in=rated_ids).order_by('?')[0]
+
+    template = loader.get_template('sort/individual.html')
+    context = RequestContext(request, {
+        'object': obj,
+        'remaining': object_count - ranking_count,
+    })
+    return HttpResponse(template.render(context))
+
+def individual_raw(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="individual_raw.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['id', 'user', 'object', 'value'])
+
+    obs = IndividualRanking.objects.all()
+    for o in obs:
+        writer.writerow([o.id, o.user, o.obj.name, o.value])
+    
+    return response
 
 # Create your views here.
 def index(request):
@@ -175,43 +211,30 @@ def rank(request):
 
 def vote(request, first, second, value):
 
-    #kConstant = 20
-
     o1 = Object.objects.get(id__exact=first)
     o2 = Object.objects.get(id__exact=second)
 
-    #o1pt = 0
-    #o2pt = 0
-
-    #if value == 0:
-    #    o1pt = 0.5
-    #    o2pt = 0.5
-    #elif value == -1:
-    #    o1pt = 0
-    #    o2pt = 1
-    #else:
-    #    o1pt = 1
-    #    o2pt = 0
-
-    #o1WinProb = (1.0 / pow(10,((o2.rank - o1.rank)/400)+1))
-    #o2WinProb = (1.0 / pow(10,((o1.rank - o2.rank)/400)+1))
-
-    #print(o1WinProb)
-    #print(o2WinProb)
-
-    #o1.rank = o1.rank + (kConstant * (o1pt - o1WinProb))
-    #o2.rank = o2.rank + (kConstant * (o2pt - o2WinProb))
-
-    #o1.save()
-    #o2.save()
-
     # use this to save the ranking for possible later analysis
     user = request.META.get('REMOTE_ADDR')
-    #user = request.session.session_key
     if not user:
         user = "Unknown"
     r = Ranking(user=user, first=o1, second=o2, value=value)
     r.save()
 
-
     return HttpResponseRedirect(reverse('index'))
+
+def vote_individual(request, obj_id, value):
+
+    if int(value) < 1 or int(value) > 10:
+        return HttpResponseRedirect(reverse('individual'))
+
+    obj = Object.objects.get(id__exact=obj_id)
+
+    # use this to save the ranking for possible later analysis
+    user = request.META.get('REMOTE_ADDR')
+    if not user:
+        user = "Unknown"
+    r = IndividualRanking(user=user, obj=obj, value=value)
+    r.save()
+
+    return HttpResponseRedirect(reverse('individual'))
