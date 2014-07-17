@@ -13,8 +13,12 @@ def index(request):
     #r = random.randint(0,len(obs)-2)
     #obs = obs[r:r+2]
 
+    user = request.META['REMOTE_ADDR']
+    if not user:
+        user = "Unknown"
+
     obs = list(Object.objects.order_by('?')[0:2])
-    total = len(Ranking.objects.all())
+    total = len(Ranking.objects.filter(user=user))
 
     #objects = list(Object.objects.all())
     #counts = {o:0 for o in objects}
