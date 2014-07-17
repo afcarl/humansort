@@ -3,7 +3,7 @@ from django.conf.urls import patterns, url
 from sort import views
 
 urlpatterns = patterns('',
-    url(r'^$', views.index, name='index'),
+    url(r'^pairwise$', views.index, name='index'),
     url(r'^rank$', views.rank, name='rank'),
     url(r'^export$', views.export, name='export'),
     url(r'^individual$', views.individual, name='individual'),
