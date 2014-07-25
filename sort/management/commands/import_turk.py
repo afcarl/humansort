@@ -39,5 +39,5 @@ class Command(BaseCommand):
 
                 r = Ranking(user=row[key['WorkerId']], first=image1,
                             second=image2,
-                            value=int(row[key['Answer.Rating']]))
+                            value=float(row[key['Answer.Rating']]))
                 r.save()

@@ -1,8 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from django.core.urlresolvers import reverse
-from math import log, sqrt
-import random
+from algorithm_test.maximumLikelihood import Item, Rating, maximum_likelihood, elo
 import csv
 
 from sort.models import IndividualRanking, Ranking, Object
@@ -45,25 +44,12 @@ def individual_raw(request):
 
 # Create your views here.
 def index(request):
-    #obs = list(Object.objects.order_by('rank'))
-    #r = random.randint(0,len(obs)-2)
-    #obs = obs[r:r+2]
-
     user = request.META.get('REMOTE_ADDR')
     if not user:
         user = "Unknown"
 
     obs = list(Object.objects.order_by('?')[0:2])
     total = len(Ranking.objects.filter(user=user))
-
-    #objects = list(Object.objects.all())
-    #counts = {o:0 for o in objects}
-    #for o in objects:
-    #    counts[o] += len(Ranking.objects.filter(first=o))
-    #    counts[o] += len(Ranking.objects.filter(second=o))
-    #
-    #obs = [img[2] for img in sorted([(counts[e], random.random(), e) for e
-    #                                    in counts])][0:2]
 
     template = loader.get_template('sort/index.html')
     context = RequestContext(request, {
@@ -92,7 +78,8 @@ def pairwise_raw(request):
     return response
 
 def export(request):
-    compute_ranking()
+    maximum_likelihood()
+    #compute_ranking()
 
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="ranking.csv"'
@@ -106,99 +93,39 @@ def export(request):
     
     return response
 
-def compute_ranking():
-    for o in Object.objects.all():
-        o.rank = random.random() / 10000.0
-        o.confidence = 100.0
-        o.save()
+def compute_ml():
+    mapping = {i: Item(0) for i in Object.objects.all()}
+    reverse_mapping = {mapping[i]: i for i in mapping}
 
-    last_error = float('inf') 
-    diff = float('inf')
+    items = [mapping[i] for i in mapping]
+    ratings = [Rating(mapping[r.first], mapping[r.second], r.value) for r in
+               Ranking.objects.all()]
+    maximum_likelihood(items, ratings)
+    
+    for i in items:
+        reverse_mapping[i].rank = i.rank
+        reverse_mapping[i].confidence = i.confidence
+        reverse_mapping[i].save()
 
-    #for i in range(0,5):
-    while diff > 0.5:
-        print(diff)
+def compute_elo():
+    mapping = {i: Item(0) for i in Object.objects.all()}
+    reverse_mapping = {mapping[i]: i for i in mapping}
 
-        error = 0
-        ranks = {}
-        confidence = {}
-
-        for o in Object.objects.all():
-            opponent_sum = 0.0
-            opponent_count = 0.0
-            wins = 0.0
-
-            for r in Ranking.objects.filter(first=o):
-                opponent_sum = r.second.rank
-                opponent_count += 1
-                if r.value == 0:
-                    wins += 0.5
-                elif r.value == 1:
-                    wins += 1.0
-            for r in Ranking.objects.filter(second=o):
-                opponent_sum = r.first.rank
-                opponent_count += 1
-                if r.value == 0:
-                    wins += 0.5
-                elif r.value == -1:
-                    wins += 1
-
-            if opponent_count > 0:
-                opponent_average = opponent_sum / opponent_count
-                accuracy = wins / opponent_count
-
-                #handle extremes
-                if accuracy == 0:
-                    accuracy = 0.0001/1.0001
-                elif accuracy == 1:
-                    accuracy = 10000.0/10001.0
-
-                #print("prob: %0.4f" % accuracy)
-
-                new_rank = opponent_average + log(accuracy/(1-accuracy))
-                #print("rank: %0.4f" % new_rank)
-
-                A = 100.0
-                if opponent_count > 1:
-                    sum_error = 0.0
-                    for oa in Object.objects.all():
-                        for r in Ranking.objects.filter(first=oa):
-                            if r.value == 0:
-                                sum_error += (0.5 - accuracy) * (0.5 - accuracy)
-                            elif r.value == 1:
-                                sum_error += (1 - accuracy) * (1 - accuracy)
-                            else:
-                                sum_error += (0 - accuracy) * (0 - accuracy)
-                        for r in Ranking.objects.filter(second=oa):
-                            if r.value == 0:
-                                sum_error += (0.5 - accuracy) * (0.5 - accuracy)
-                            elif r.value == -1:
-                                wins += 1
-                                sum_error += (1 - accuracy) * (1 - accuracy)
-                            else:
-                                sum_error += (0 - accuracy) * (0 - accuracy)
-                    s = sqrt((1 / (opponent_count - 1)) * sum_error)
-                    A = 1.96 * (s / sqrt(opponent_count))
-
-                error += abs(o.rank - new_rank)
-                ranks[o.id] = new_rank
-                confidence[o.id] = A
-            else:
-                ranks[o.id] = 0.0
-                confidence[o.id] = 100.0
-
-        for o in Object.objects.all():
-            o.rank = ranks[o.id]
-            o.confidence = confidence[o.id]
-            o.save()
-
-        diff = abs(last_error - error)
-        last_error = error
+    items = [mapping[i] for i in mapping]
+    ratings = [Rating(mapping[r.first], mapping[r.second], r.value) for r in
+               Ranking.objects.all()]
+    elo(items, ratings)
+    
+    for i in items:
+        reverse_mapping[i].rank = i.rank
+        reverse_mapping[i].confidence = i.confidence
+        reverse_mapping[i].save()
 
 
 def rank(request):
     
-    compute_ranking()
+    #compute_elo()
+    compute_ml()
 
     obs = Object.objects.order_by('-rank')
 
