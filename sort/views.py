@@ -1,7 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from django.core.urlresolvers import reverse
-from algorithm_test.compute_ranking import Item, Rating, maximum_likelihood, elo
+from compute_ranking import Item, Rating, maximum_likelihood, elo
 import csv
 
 from sort.models import IndividualRanking, Ranking, Object
