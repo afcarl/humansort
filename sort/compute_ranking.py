@@ -1,7 +1,7 @@
 import random
 from math import sqrt, log, exp, pi
-import matplotlib.pyplot as plt
-from scipy.stats import pearsonr, spearmanr
+#import matplotlib.pyplot as plt
+#from scipy.stats import pearsonr, spearmanr
 
 class Item:
 
@@ -63,14 +63,14 @@ def log_likelihood(ratings):
 
     return log_likelihood
 
-def plot_pdf(item, ratings):
-    x = [(-3.0 + v * 0.01) for v in range(0, 600)]
-    y = [pdf(v, item, ratings) for v in x]
-
-    plt.scatter(x,y, color="black")
-    plt.plot([item.rank], [pdf(item.rank, item, ratings)], 'ro')
-    plt.plot([item.true_value], [pdf(item.true_value, item, ratings)], 'bo')
-    plt.show()
+#def plot_pdf(item, ratings):
+#    x = [(-3.0 + v * 0.01) for v in range(0, 600)]
+#    y = [pdf(v, item, ratings) for v in x]
+#
+#    plt.scatter(x,y, color="black")
+#    plt.plot([item.rank], [pdf(item.rank, item, ratings)], 'ro')
+#    plt.plot([item.true_value], [pdf(item.true_value, item, ratings)], 'bo')
+#    plt.show()
 
 def normal_pdf(x, u, sigma):
     return (1.0 / (sigma * sqrt(2 * pi)) * 
@@ -359,15 +359,15 @@ if __name__ == "__main__":
     x = [i.true_value for i in items]    
     y = [i.rank for i in items]    
 
-    print(pearsonr(x,y))
-    print(spearmanr(x,y))
-    plt.scatter(x,y)
+    #print(pearsonr(x,y))
+    #print(spearmanr(x,y))
+    #plt.scatter(x,y)
 
-    for i in items:
-        plt.plot([i.true_value, i.true_value], [i.rank + i.confidence, i.rank -
-                                               i.confidence])
+    #for i in items:
+    #    plt.plot([i.true_value, i.true_value], [i.rank + i.confidence, i.rank -
+    #                                           i.confidence])
 
-    plt.show()
+    #plt.show()
     
     
 
