@@ -14,7 +14,7 @@ class Ranking(models.Model):
     user = models.CharField(max_length=200)
     first = models.ForeignKey(Object, related_name='ranking_first')
     second = models.ForeignKey(Object, related_name='ranking_second')
-    value = models.IntegerField()
+    value = models.FloatField()
 
     def __str__(self):
         return str((self.user, self.first, self.second, self.value))

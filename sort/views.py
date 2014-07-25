@@ -1,7 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from django.core.urlresolvers import reverse
-from algorithm_test.maximumLikelihood import Item, Rating, maximum_likelihood, elo
+from algorithm_test.compute_ranking import Item, Rating, maximum_likelihood, elo
 import csv
 
 from sort.models import IndividualRanking, Ranking, Object
@@ -78,18 +78,18 @@ def pairwise_raw(request):
     return response
 
 def export(request):
-    maximum_likelihood()
-    #compute_ranking()
+    compute_ml()
+    #compute_elo()
 
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="ranking.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(['name', 'image', 'rank', 'confidence'])
+    writer.writerow(['name', 'html', 'estimated_rank', 'standard_error'])
 
     obs = Object.objects.order_by('-rank')
     for o in obs:
-        writer.writerow([o.name, o.image, o.rank, o.confidence])
+        writer.writerow([o.name, o.image, o.rank, o.confidence/1.96])
     
     return response
 
@@ -145,7 +145,13 @@ def vote(request, first, second, value):
     user = request.META.get('REMOTE_ADDR')
     if not user:
         user = "Unknown"
-    r = Ranking(user=user, first=o1, second=o2, value=value)
+    if float(value) == 0.5:
+        r1 = Ranking(user=user, first=o1, second=o2, value=0)
+        r1.save()
+        r2 = Ranking(user=user, first=o1, second=o2, value=1)
+        r2.save()
+    else:
+        r = Ranking(user=user, first=o1, second=o2, value=value)
     r.save()
 
     return HttpResponseRedirect(reverse('index'))

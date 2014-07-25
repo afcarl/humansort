@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from sort.models import Object
 from sort.models import Ranking
+import random
 import csv
 
 class Command(BaseCommand):
@@ -37,7 +38,22 @@ class Command(BaseCommand):
                 else:
                     image2 = image2[0]
 
-                r = Ranking(user=row[key['WorkerId']], first=image1,
-                            second=image2,
-                            value=float(row[key['Answer.Rating']]))
+                if float(row[key['Answer.Rating']]) == 0.5:
+                    r1 = Ranking(user=row[key['WorkerId']], first=image1,
+                                second=image2,
+                                value=0)
+                    r1.save()
+                    r2 = Ranking(user=row[key['WorkerId']], first=image1,
+                                second=image2,
+                                value=1)
+                    r2.save()
+                    #print("randomizing rating")
+                    #if random.random() <= 0.5:
+                    #    row[key['Answer.Rating']] = 0
+                    #else:
+                    #    row[key['Answer.Rating']] = 1
+                else:
+                    r = Ranking(user=row[key['WorkerId']], first=image1,
+                                second=image2,
+                                value=float(row[key['Answer.Rating']]))
                 r.save()
